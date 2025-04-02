@@ -6,11 +6,14 @@ import Link from 'next/link';
 import { signUp } from '@/app/_actions/authActions';
 import { toast } from 'sonner';
 import { useActionToast } from '@/app/_hooks/useActionToast';
+import { useRouter } from 'next/navigation';
 export default function SignUpForm() {
     const actionToast = useActionToast()
-    async function handleSubmit(formData:FormData){
+    const router = useRouter()
+    async function handleSubmit(formData: FormData) {
         const response = await signUp(formData)
         actionToast(response)
+        if (response.status === 'success') router.push('/')
     }
     return (
         <form className={styles.signInForm} action={handleSubmit}>
@@ -25,7 +28,7 @@ export default function SignUpForm() {
                     </Link>
                 </Button>
                 <Button type='submit'>
-                        Sign up
+                    Sign up
                 </Button>
             </div>
         </form>

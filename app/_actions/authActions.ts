@@ -1,9 +1,10 @@
 'use server'
 ;
 import { generateSalt, hashPassword } from "../_auth/passwordHasher";
+import { createUserSession } from "../_auth/session";
 import { supabase } from "../_lib/supabase";
 import { AuthResponse } from "../types/authActionResponse";
-import { UserRecord } from "../types/UserRecord";
+import { UserRecord, UserToCreateType } from "../types/UserRecord";
 
 export async function signIn(formData: FormData){
     const {email,password} = Object.fromEntries(formData) as unknown as {email:string; password:string;}
@@ -11,11 +12,11 @@ export async function signIn(formData: FormData){
     console.log(data)
 }
 export async function signUp(formData: FormData): Promise<AuthResponse>{
-    const {name,email,password} = Object.fromEntries(formData) as unknown as {email:string; password:string; name:string;}
+    const {name,email,password} = Object.fromEntries(formData) as unknown as {name:string; email:string; password:string; }
     try {
         const {data:existingUser} =
             await supabase 
-            .from('Users')
+            .from('users')
             .select('*')
             .eq('email',email)
             .single()
@@ -24,21 +25,32 @@ export async function signUp(formData: FormData): Promise<AuthResponse>{
 
         const salt = generateSalt()
         const hashedPassword = await hashPassword(password,salt)
-        const userToCreate : UserRecord = {
+        const userToCreate : UserToCreateType = {
             name,
             email,
             password:hashedPassword,
-            salt
+            salt,
+            role:'user'
         }
+        console.log('here')
 
          const {data:createdUser, error } =
          await supabase
-         .from('Users')
-         .insert([{userToCreate}])
+         .from('users')
+         .insert([userToCreate])
+         .select()
+         .single()
 
-         if(error) return {message:'Could not register user',status:'error'}
-         
-         return {message:hashedPassword, status:'success'}
+         if(error || !createdUser) return {message:'Could not register user',status:'error'}
+
+         const isSessionCreated = await createUserSession(createdUser)
+
+         if(!isSessionCreated) {
+            await supabase.from('users').delete().eq('id',createdUser.id)
+            return {message:'Could not create user session', status:'error'}
+         }
+
+         return {message:'User was created', status:'success'}
 
     } catch (error) {
         if(error instanceof Error) return {message:error.message, status:'error'}
