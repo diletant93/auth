@@ -3,12 +3,13 @@ type InputRowProps = {
     label:string;
     placeHolder?:string;
     type?:'email' | 'password';
+    name:string;
 }
-export default function InputRow({label,type, placeHolder}:InputRowProps) {
+export default function InputRow({label,name,type, placeHolder}:InputRowProps) {
   return (
     <div className={styles.row}>
         <label htmlFor={label}>{label}</label>
-        <input type={type || 'text'} placeholder={placeHolder || ''}/>
+        <input type={type || 'text'} placeholder={placeHolder || ''} name={name}/>
     </div>
   );
 }
