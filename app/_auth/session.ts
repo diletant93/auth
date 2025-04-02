@@ -14,12 +14,12 @@ export async function createUserSession(user:UserRecord): Promise<boolean>{
     const expire =  new Date(Date.now() + SESSION_EXPIRATION_SECONDS * 1000);
 
     const sessionToCreate:Session = {
-        id:sessionId,
+        sessionId,
         userId:user.id,
         role:user.role || 'user',
         expire
     }
-
+    console.log('before creating session')
     const {data:createdSession, error} =
     await 
     supabase
@@ -27,9 +27,9 @@ export async function createUserSession(user:UserRecord): Promise<boolean>{
     .insert([sessionToCreate])
     .select()
     .single()
+    console.log('createdSession:',createdSession)
     
     if(error || !createdSession) return false
- 
     cookiesStore.set(COOKIE_SESSION_KEY, sessionId, {
         secure:true,
         httpOnly:true,
