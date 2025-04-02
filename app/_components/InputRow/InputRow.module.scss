@@ -1,0 +1,25 @@
+.row{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin-top: 2rem;
+    & label{
+        color:white;
+        font-size: 2rem;
+    }
+    & input{
+        background-color: #ebe8e8;
+        border:1px solid #b8b8b8;
+        border-radius: 1rem;
+        padding:1.7rem .8rem;
+        box-shadow: 0 0 .5rem black;
+        color: black;
+        font-size: 1rem;
+        &::placeholder{
+            color: #4f4d4d;
+        }
+        outline-offset: .7rem;
+        outline-color: white;
+    }
+}

@@ -1,0 +1,20 @@
+.userCard{
+    width: 40rem;
+    border: 1px solid white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    & .userName{
+        font-weight: 600;
+    }
+    & .userName,& .userRole{
+        font-size: 2rem;
+    }
+    & .controls{
+        display: flex;
+        justify-content: flex-end;
+        gap:.4rem;
+        button{
+            flex: 1 1 0;
+        }
+    }
+}
