@@ -3,9 +3,8 @@ import { UserRecord } from "../types/UserRecord";
 import crypto from 'crypto'
 import { supabase } from "../_lib/supabase";
 import { Session } from "../types/Session";
-
-const SESSION_EXPIRATION_SECONDS = 60*60*24*7
-const COOKIE_SESSION_KEY = 'session-id'
+import { COOKIE_SESSION_KEY, SESSION_EXPIRATION_SECONDS } from "../constants/authenticationRelated";
+import { cache } from "react";
 
 export async function createUserSession(user:UserRecord): Promise<boolean>{
     const cookiesStore =  await cookies()
@@ -38,4 +37,37 @@ export async function createUserSession(user:UserRecord): Promise<boolean>{
     })
 
     return true
+}
+
+const getSessionId = cache(async() =>{
+    return  (await (await cookies)()).get(COOKIE_SESSION_KEY)?.value
+})
+
+async function getUserSessionById(sessionId:string){
+    try {
+        const {data, error} = 
+                await 
+                supabase
+                .from('sessions')
+                .select('*')
+                .eq('sessionId',sessionId)
+                .single()
+
+        if(error) return null
+
+        return data as Session
+
+    } catch (error) {
+        return null 
+    }
+}
+
+export async function getUserFromSession(){
+    const sessionId = await getSessionId()
+    if(!sessionId) return null
+
+    const userSession = await getUserSessionById(sessionId)
+    if(!userSession) return null
+
+    return userSession
 }

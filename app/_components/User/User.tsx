@@ -1,7 +1,7 @@
 import style from '@/app/_components/User/User.module.scss'
 import Button from '../Button/Button';
 export type UserType = {
-    name:string;
+    name?:string;
     role:string;
 }
 type UserProps = {
@@ -10,7 +10,7 @@ type UserProps = {
 export default function User({user}:UserProps) {
   return (
     <div className={style.userCard}>
-       <p className={style.userName}>User:{user.name}</p>
+       <p className={style.userName}>User:{user.name || 'No name yet'}</p>
        <p className={style.userRole}>Role:{user.role}</p>
        <div className={style.controls}>
         <Button>PrivatePage</Button>

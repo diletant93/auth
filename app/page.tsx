@@ -2,8 +2,9 @@ import Link from "next/link";
 import Button from "./_components/Button/Button";
 import styles from '@/app/page.module.scss'
 import User, { UserType } from "./_components/User/User";
-export default function Home() {
-  const fullUser: UserType | undefined =undefined
+import { getUserFromSession } from "./_auth/session";
+export default async function Home() {
+  const fullUser: UserType | null = await getUserFromSession()
   if (fullUser) return <User user={fullUser} />
   return (
     <div className={styles.authorize}>
