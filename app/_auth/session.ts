@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
-import { UserRecord } from "../types/UserRecord";
+import { SessionUser, UserRecord } from "../types/UserRecord";
 import crypto from 'crypto'
 import { supabase } from "../_lib/supabase";
 import { Session } from "../types/Session";
-import { COOKIE_SESSION_KEY, SESSION_EXPIRATION_SECONDS } from "../constants/authenticationRelated";
+import { COOKIE_SESSION_EXPIRE_KEY, COOKIE_SESSION_KEY, SESSION_EXPIRATION_SECONDS } from "../constants/authenticationRelated";
 import { cache } from "react";
 
 export async function createUserSession(user:UserRecord): Promise<boolean>{
@@ -33,8 +33,13 @@ export async function createUserSession(user:UserRecord): Promise<boolean>{
         secure:true,
         httpOnly:true,
         sameSite:'lax',
-        expires:Date.now() + SESSION_EXPIRATION_SECONDS * 1000
     })
+
+    cookiesStore.set(COOKIE_SESSION_EXPIRE_KEY, expire.getTime().toString(), {
+        secure:true,
+        httpOnly:true,
+        sameSite:'lax',
+    } )
 
     return true
 }
@@ -69,5 +74,35 @@ export async function getUserFromSession(){
     const userSession = await getUserSessionById(sessionId)
     if(!userSession) return null
 
-    return userSession
+    return userSession as SessionUser
+}
+
+
+
+async function deleteUserSessionById(sessionId:string){
+    try {
+        const {error} = 
+                await 
+                supabase
+                .from('sessions')
+                .delete()
+                .eq('sessionId',sessionId)
+        if(error) return false
+        return true
+    } catch (error) {
+        return false 
+    }
+}
+export async function removeUserFromSession(){
+    const sessionId = await getSessionId()
+    if(!sessionId) return null
+
+    const isDeleted = await deleteUserSessionById(sessionId)
+    if(!isDeleted) return null
+
+    const cookieStore = await cookies()
+    await Promise.all(
+        [cookieStore.delete(COOKIE_SESSION_KEY),
+        cookieStore.delete(COOKIE_SESSION_EXPIRE_KEY)]
+    ) 
 }

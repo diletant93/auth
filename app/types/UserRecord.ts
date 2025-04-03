@@ -17,3 +17,7 @@ export type UserToCreateType ={
     role?:Role;
 }
 
+export type SessionUser = {
+    userId:string;
+    role:Role;
+}

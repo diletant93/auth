@@ -7,14 +7,9 @@ import { signUp } from '@/app/_actions/authActions';
 import { toast } from 'sonner';
 import { useActionToast } from '@/app/_hooks/useActionToast';
 import { useRouter } from 'next/navigation';
+import { useAuthActionHandler } from '@/app/_hooks/useAuthActionHandler';
 export default function SignUpForm() {
-    const actionToast = useActionToast()
-    const router = useRouter()
-    async function handleSubmit(formData: FormData) {
-        const response = await signUp(formData)
-        actionToast(response)
-        if (response.status === 'success') router.push('/')
-    }
+    const handleSubmit = useAuthActionHandler(signUp)
     return (
         <form className={styles.signInForm} action={handleSubmit}>
             <p className='cta'>Sign Up</p>

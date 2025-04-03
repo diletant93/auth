@@ -1,8 +1,6 @@
-import { Role } from "./Role";
+import { SessionUser } from "./UserRecord";
 
 export type Session = {
     sessionId:string;
-    userId:string;
-    role:Role;
     expire:Date;
-}
+} & SessionUser

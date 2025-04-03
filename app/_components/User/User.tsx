@@ -1,21 +1,36 @@
+
 import style from '@/app/_components/User/User.module.scss'
 import Button from '../Button/Button';
-export type UserType = {
-    name?:string;
-    role:string;
-}
+import LogOutButton from '../LogOutButton/LogOutButton';
+import { SessionUser, UserRecord } from '@/app/types/UserRecord';
+import Link from 'next/link';
 type UserProps = {
-    user:UserType;
+    user:UserRecord | SessionUser
+}
+function isUserRecord(user:UserRecord | SessionUser): user is UserRecord{
+  return (user as UserRecord).name !== undefined;
 }
 export default function User({user}:UserProps) {
-  return (
-    <div className={style.userCard}>
-       <p className={style.userName}>User:{user.name || 'No name yet'}</p>
-       <p className={style.userRole}>Role:{user.role}</p>
-       <div className={style.controls}>
-        <Button>PrivatePage</Button>
-        <Button>Log Out</Button>
-       </div>
-    </div>
-  );
+  if(!isUserRecord(user)){
+    return (
+      <div className={style.userCard}>
+         <p className={style.userRole}>Role:{user.role}</p>
+         <div className={style.controls}>
+          <Button><Link href='/'>Home</Link></Button>
+          <LogOutButton/>
+         </div>
+      </div>
+    );
+  }
+  if(isUserRecord(user)){
+    return (
+      <div className={style.userCard}>
+         <p className={style.userName}>User:{user.name || 'No name yet'}</p>
+         <div className={style.controls}>
+          <Button><Link href='/private'>Private page</Link></Button>
+          <LogOutButton/>
+         </div>
+      </div>
+    );
+  }
 }
