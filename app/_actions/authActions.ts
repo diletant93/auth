@@ -1,6 +1,4 @@
-'use server'
-;
-import { redirect } from "next/dist/server/api-utils";
+'use server';
 import { comparePassword, generateSalt, hashPassword } from "../_auth/passwordHasher";
 import { createUserSession, removeUserFromSession } from "../_auth/session";
 import { supabase } from "../_lib/supabase";

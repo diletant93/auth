@@ -4,6 +4,7 @@ import Button from '../Button/Button';
 import LogOutButton from '../LogOutButton/LogOutButton';
 import { SessionUser, UserRecord } from '@/app/types/UserRecord';
 import Link from 'next/link';
+import ToggleRole from '../ToggleRole/ToggleRole';
 type UserProps = {
     user:UserRecord | SessionUser
 }
@@ -17,7 +18,7 @@ export default function User({user}:UserProps) {
          <p className={style.userRole}>Role:{user.role}</p>
          <div className={style.controls}>
           <Button><Link href='/'>Home</Link></Button>
-          <LogOutButton/>
+          <ToggleRole/>
          </div>
       </div>
     );

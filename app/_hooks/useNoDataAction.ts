@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation"
 import { useActionToast } from "./useActionToast"
 import { AuthResponse } from "../types/authActionResponse"
 
-export function useAuthLogoutHandler(action:()=>Promise<AuthResponse>){
+export function useNoDataAction(action:()=>Promise<AuthResponse>){
     const actionToast = useActionToast()
     const router = useRouter()
 

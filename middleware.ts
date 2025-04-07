@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_SESSION_EXPIRE_KEY, COOKIE_SESSION_KEY } from "./app/constants/authenticationRelated";
 import { deleteSessionById } from "./app/services/sessionApi";
 import { ADMIN_ROUTES, PRIVATE_ROUTES} from "./app/constants/routesRelated";
-import { getUserFromSession } from "./app/_auth/session";
+import { getUserFromSession, updateUserSessionExpiration } from "./app/_auth/session";
 
 export async function middleware(request:NextRequest){
     
@@ -16,6 +16,10 @@ export async function middleware(request:NextRequest){
     const routesResult = await middlewareRoutes(request)
     if(routesResult) return routesResult
 
+    const isUpdatedSession = await updateUserSessionExpiration()
+    if(!isUpdatedSession) return NextResponse.redirect(new URL('/sign-in',request.url))
+    
+        
     return NextResponse.next()
 }
 
@@ -55,7 +59,5 @@ async function middlewareRoutes(request:NextRequest){
 }
 
 export const config = {
-    matcher:[...ADMIN_ROUTES, ...PRIVATE_ROUTES,
-         '/((?!sign-in|api|_next/static|_next/image|favicon.ico).*)'
-    ]
+    matcher:['/','/account','/admin']
 }
