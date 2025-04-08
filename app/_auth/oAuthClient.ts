@@ -48,19 +48,26 @@ export class oAuthClient<T>{
     }
 
     async getAuthUrl(){
-        const state = await createAuthState()
+        const [state, codeVerifier] = await Promise.all([
+            createAuthState(),
+            createCodeVerifier()
+        ])
+
         const url = new URL(this.urls.authUrl)
 
         url.searchParams.set('scope', this.scopes.join(' '))
         url.searchParams.set('redirect_uri', this.redirectUrl.toString())
         url.searchParams.set('client_id', this.client_id)
-        url.searchParams.set('state',state)
         url.searchParams.set('response_type','code')
+        
+        url.searchParams.set('state',state)
+        url.searchParams.set('code_challenge_method','S256')
+        url.searchParams.set('code_challenge',crypto.hash('sha256',codeVerifier,'base64url'))
 
         return url.toString()
     }
-
-    async fetchToken(code:string){
+    
+    async fetchToken(code:string, codeVerifier:string){
         try {
             console.log({code})
             const response = await fetch(this.urls.tokenUrl,{
@@ -75,6 +82,7 @@ export class oAuthClient<T>{
                     grant_type:'authorization_code',
                     client_id:this.client_id,
                     client_secret:this.client_secret,
+                    code_verifier:codeVerifier
                 })
             })
             const rawData = await response.json()
