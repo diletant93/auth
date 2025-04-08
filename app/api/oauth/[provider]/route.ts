@@ -19,7 +19,7 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
 
     try {
         const oAuthClient = createOAuthClient(provider)
-
+        await oAuthClient.fetchToken(code)
     } catch (error) {   
         console.error(error)
     }

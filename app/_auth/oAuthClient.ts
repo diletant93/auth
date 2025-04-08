@@ -1,7 +1,7 @@
 import { AuthProvider } from "../types/oAuthProvider";
 import crypto from 'crypto'
 import { cookies } from "next/headers";
-import { COOKIE_STATE_EXPIRATION_SECCONDS, COOKIE_STATE_KEY } from "../constants/authenticationRelated";
+import { COOKIE_CODE_VERIFIER_KEY, COOKIE_STATE_EXPIRATION_SECCONDS, COOKIE_STATE_KEY } from "../constants/authenticationRelated";
 import { createDiscordOAuthClient } from "./oAuthClients/discord";
 type oAuthClientConstructorProps = {
     provider:AuthProvider;
@@ -62,14 +62,17 @@ export class oAuthClient<T>{
                 headers:{
                     'Content-type':'application/x-www-form-urlencoded'
                 },
-                body:{
+                body:new URLSearchParams({
                     code,
                     grant_type:'authorization_code',
-                    redirect_uri:process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URL_BASE,
-                }
+                    redirect_uri:this.redirectUrl.toString(),
+                    client_id:this.client_id,
+                    client_secret:this.client_secret,
+                    code_verifier: await createCodeVerifier()
+                })
             })
             const data = await response.json()
-            return data
+            console.log('RAW DATA=>>>',data)
         } catch (error) {
             throw error
         }
@@ -102,4 +105,20 @@ export async function getAuthState(){
     const cookieStore = await cookies()
     const state = cookieStore.get(COOKIE_STATE_KEY)?.value
     return state
+}
+async function createCodeVerifier(){
+    const codeVerifier = crypto.randomBytes(64).toString('hex').normalize()
+    const cookieStore = await cookies()
+    cookieStore.set(COOKIE_CODE_VERIFIER_KEY, codeVerifier, {
+        httpOnly:true,
+        secure:true,
+        sameSite:'lax',
+        expires:Date.now() + COOKIE_STATE_EXPIRATION_SECCONDS * 1000
+    })
+    return codeVerifier
+}
+export async function getCodeVerifier(){
+    const cookieStore = await cookies()
+    const codeVerifier = cookieStore.get(COOKIE_CODE_VERIFIER_KEY)?.value
+    return codeVerifier
 }
