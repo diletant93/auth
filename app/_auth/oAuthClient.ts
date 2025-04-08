@@ -30,7 +30,7 @@ export class oAuthClient<T>{
     private readonly client_id:string;
     private readonly client_secret:string;
     private readonly user:{
-        schema:z.ZodSchema;
+        schema:z.ZodSchema<T>;
         parser:(data:T) => {id:string; email:string; name:string;}
     };
     private readonly tokenSchema = z.object({
