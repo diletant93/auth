@@ -18,7 +18,7 @@ export async function createUserSession(user:UserRecord): Promise<boolean>{
         role:user.role || 'user',
         expire
     }
-    console.log('before creating session')
+
     const {data:createdSession, error} =
     await 
     supabase

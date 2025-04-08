@@ -26,20 +26,16 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
         const user = await connectAuthAccountToUser(provider, authAccount)
         const isCreatedUserSession = await createUserSession(user)
         if(!isCreatedUserSession) redirect(`/sign-in?oautherror=${encodeURIComponent('could not create session')}`)
-        redirect('/')
-    } catch (error) {   
+        } catch (error) {   
         console.error(error)
         redirect(`/sign-in?oautherror=${encodeURIComponent('could not authorize')}`)
     }
+redirect('/')
 }
 
 async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:string; email:string; name:string;}){
-    //check if exists
-    //if it does not create the user 
-    //if such a authAccount exists (check by the id related to the user) 
-    //if not create the auth Account
-    //return the user
     let user: UserRecord;
+
     const {data:existingUser} = 
     await supabase
     .from('users')
@@ -48,6 +44,7 @@ async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:st
     .single()
 
     user = existingUser
+
     if(!existingUser){
         const {data:createdUser} = await supabase
         .from('users')
