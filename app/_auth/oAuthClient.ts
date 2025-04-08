@@ -9,6 +9,7 @@ type oAuthClientConstructorProps = {
     urls:{
         authUrl:string;
         tokenUrl:string;
+        userUrl:string;
     };
     scopes:string[];
     client_id:string;
@@ -19,6 +20,7 @@ export class oAuthClient<T>{
     private readonly urls:{
         authUrl:string;
         tokenUrl:string;
+        userUrl:string;
     };
     private readonly scopes:string[];
     private readonly client_id:string;
@@ -66,10 +68,21 @@ export class oAuthClient<T>{
 
         return url.toString()
     }
-    
-    async fetchToken(code:string, codeVerifier:string){
+    async fetchUser(code:string){
+        const codeVerifier = await getCodeVerifier()
+        if(!codeVerifier) throw new InvalidCodeVerifier()
+        const {accessToken, tokenType} = await this.fetchToken(code, codeVerifier)
+        const response = await fetch(this.urls.userUrl,{
+            headers:{
+                Authorization:`${tokenType} ${accessToken}`
+            }
+        })
+        const data = await response.json()
+        console.log('RAW USER =>>', data)
+
+    }
+    private async fetchToken(code:string, codeVerifier:string){
         try {
-            console.log({code})
             const response = await fetch(this.urls.tokenUrl,{
                 method:'POST',
                 headers:{
@@ -101,6 +114,11 @@ export class oAuthClient<T>{
 class InvalidToken extends Error{
     constructor(){
         super('Invalid token')
+    }
+}
+class InvalidCodeVerifier extends Error{
+    constructor(){
+        super('Invalid code verifier')
     }
 }
 

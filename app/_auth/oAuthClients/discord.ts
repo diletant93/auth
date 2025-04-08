@@ -5,7 +5,8 @@ export function createDiscordOAuthClient(){
         provider:'discord',
         urls:{
             authUrl:'https://discord.com/oauth2/authorize',
-            tokenUrl:'https://discord.com/api/oauth2/token'
+            tokenUrl:'https://discord.com/api/oauth2/token',
+            userUrl:'https://discord.com/users/@me'
         },
         scopes:['identify','email'],
         client_id:process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '',
