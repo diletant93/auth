@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { COOKIE_CODE_VERIFIER_KEY, COOKIE_STATE_EXPIRATION_SECCONDS, COOKIE_STATE_KEY } from "../constants/authenticationRelated";
 import { createDiscordOAuthClient } from "./oAuthClients/discord";
 import {z} from 'zod'
-type oAuthClientConstructorProps = {
+type oAuthClientConstructorProps<T> = {
     provider:AuthProvider;
     urls:{
         authUrl:string;
@@ -14,6 +14,10 @@ type oAuthClientConstructorProps = {
     scopes:string[];
     client_id:string;
     client_secret:string;
+    user:{
+        schema:z.ZodSchema;
+        parser:(data:T) => {id:string; email:string; name:string;}
+    };
 }
 export class oAuthClient<T>{
     private readonly provider:AuthProvider;
@@ -25,7 +29,10 @@ export class oAuthClient<T>{
     private readonly scopes:string[];
     private readonly client_id:string;
     private readonly client_secret:string;
-
+    private readonly user:{
+        schema:z.ZodSchema;
+        parser:(data:T) => {id:string; email:string; name:string;}
+    };
     private readonly tokenSchema = z.object({
         access_token:z.string(),
         token_type:z.string(),
@@ -36,13 +43,15 @@ export class oAuthClient<T>{
         urls,
         scopes,
         client_id,
-        client_secret
-    }:oAuthClientConstructorProps){
+        client_secret,
+        user
+    }:oAuthClientConstructorProps<T>){
         this.provider = provider
         this.urls = urls
         this.scopes = scopes
         this.client_id = client_id
         this.client_secret = client_secret
+        this.user = user
     }
 
     private get redirectUrl(){
@@ -77,8 +86,10 @@ export class oAuthClient<T>{
                 Authorization:`${tokenType} ${accessToken}`
             }
         })
-        const data = await response.json()
-        console.log('RAW USER =>>', data)
+        const rawUser = await response.json()
+        const {data, success} = this.user.schema.safeParse(rawUser)
+        if(!success) return new InvalidUser()
+        return this.user.parser(data)
 
     }
     private async fetchToken(code:string, codeVerifier:string){
@@ -119,6 +130,11 @@ class InvalidToken extends Error{
 class InvalidCodeVerifier extends Error{
     constructor(){
         super('Invalid code verifier')
+    }
+}
+class InvalidUser extends Error{
+    constructor(){
+        super('Invalid user')
     }
 }
 

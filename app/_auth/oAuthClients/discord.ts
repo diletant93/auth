@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { oAuthClient } from "../oAuthClient";
 
 export function createDiscordOAuthClient(){
@@ -6,12 +7,22 @@ export function createDiscordOAuthClient(){
         urls:{
             authUrl:'https://discord.com/oauth2/authorize',
             tokenUrl:'https://discord.com/api/oauth2/token',
-            userUrl:'https://discord.com/users/@me'
+            userUrl:'https://discord.com/api/users/@me'
         },
         scopes:['identify','email'],
         client_id:process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '',
         client_secret:process.env.NEXT_PRIVATE_DISCORD_CLIENT_SECRET || '',
+        user:{
+            schema:discordSchema,
+          
+        }
     })
 
     return authClient
 }
+const discordSchema = z.object({
+    id:z.string(),
+    username:z.string(),
+    global_name:z.string().nullable(),
+    email:z.string()
+})
