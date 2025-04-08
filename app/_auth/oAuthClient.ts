@@ -15,7 +15,7 @@ type oAuthClientConstructorProps<T> = {
     client_id:string;
     client_secret:string;
     user:{
-        schema:z.ZodSchema;
+        schema:z.ZodSchema<T>;
         parser:(data:T) => {id:string; email:string; name:string;}
     };
 }
@@ -90,7 +90,6 @@ export class oAuthClient<T>{
         const {data, success} = this.user.schema.safeParse(rawUser)
         if(!success) return new InvalidUser()
         return this.user.parser(data)
-
     }
     private async fetchToken(code:string, codeVerifier:string){
         try {

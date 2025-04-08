@@ -19,10 +19,21 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
 
     try {
         const oAuthClient = createOAuthClient(provider)
-       await oAuthClient.fetchUser(code)
+        const authUser =  await oAuthClient.fetchUser(code)
+        
     } catch (error) {   
         console.error(error)
     }
 
     redirect('/')
+}
+
+async function connectAuthAccountToUser(authAccount: {id:string; email:string; name:string;}){
+    //check if exists
+    //if it does not create the user 
+    //if such a authAccount exists (check by the id related to the user) 
+    //if not create the auth Account
+    //return the user
+    
+    
 }

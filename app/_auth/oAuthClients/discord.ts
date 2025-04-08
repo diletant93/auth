@@ -14,7 +14,11 @@ export function createDiscordOAuthClient(){
         client_secret:process.env.NEXT_PRIVATE_DISCORD_CLIENT_SECRET || '',
         user:{
             schema:discordSchema,
-          
+            parser:(data)=>({
+                id:data.id,
+                email:data.email,
+                name:data.global_name ?? data.username
+            })
         }
     })
 
