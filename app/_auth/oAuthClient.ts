@@ -61,7 +61,6 @@ export class oAuthClient<T>{
     }
 
     async fetchToken(code:string){
-        // eslint-disable-next-line no-useless-catch
         try {
             console.log({code})
             const response = await fetch(this.urls.tokenUrl,{
@@ -86,6 +85,7 @@ export class oAuthClient<T>{
                 tokenType:data.token_type
             }
         } catch (error) {
+            console.error(error)
             throw error
         }
     }
