@@ -1,9 +1,10 @@
 import { AuthProvider } from "../types/oAuthProvider";
 import crypto from 'crypto'
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { COOKIE_CODE_VERIFIER_KEY, COOKIE_STATE_EXPIRATION_SECCONDS, COOKIE_STATE_KEY } from "../constants/authenticationRelated";
 import { createDiscordOAuthClient } from "./oAuthClients/discord";
 import {z} from 'zod'
+import { createGithubOAuthClient } from "./oAuthClients/github";
 type oAuthClientConstructorProps<T> = {
     provider:AuthProvider;
     urls:{
@@ -87,6 +88,10 @@ export class oAuthClient<T>{
             }
         })
         const rawUser = await response.json()
+        console.log('RAW USER =>>',rawUser)
+        if(this.provider === 'github' && (rawUser.email == null)){
+            rawUser.email = await getGithubAccountEmail(accessToken, tokenType)
+        }
         const {data, success} = this.user.schema.safeParse(rawUser)
         if(!success) throw new InvalidUser()
         return this.user.parser(data)
@@ -140,7 +145,7 @@ class InvalidUser extends Error{
 export function createOAuthClient(provider:AuthProvider){
     switch(provider){
         case 'github':
-            return createDiscordOAuthClient()
+            return createGithubOAuthClient()
         case 'discord':
             return createDiscordOAuthClient()
         default:
@@ -179,4 +184,18 @@ export async function getCodeVerifier(){
     const cookieStore = await cookies()
     const codeVerifier = cookieStore.get(COOKIE_CODE_VERIFIER_KEY)?.value
     return codeVerifier
+}
+
+async function getGithubAccountEmail(accessToken:string, tokenType:string){
+    const response = await fetch('https://api.github.com/user/emails',{
+        headers:{
+            Authorization:`${tokenType} ${accessToken}`
+        }
+    })
+    const emails = await response.json() as {email:string; primary:boolean}[]
+    if(!emails) throw new Error('no emails')
+    console.log('EMAILS ==>',emails)
+    const email = emails.find(email => email.primary)?.email ?? emails[0].email
+    console.log('EMAIL=>>>',email)
+    return email
 }
