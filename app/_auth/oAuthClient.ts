@@ -57,15 +57,17 @@ export class oAuthClient<T>{
     async fetchToken(code:string){
         // eslint-disable-next-line no-useless-catch
         try {
+            console.log({code})
             const response = await fetch(this.urls.tokenUrl,{
                 method:'POST',
                 headers:{
-                    'Content-type':'application/x-www-form-urlencoded'
+                    'Content-type':'application/x-www-form-urlencoded',
+                    Accept:'application/json'
                 },
                 body:new URLSearchParams({
                     code,
-                    grant_type:'authorization_code',
                     redirect_uri:this.redirectUrl.toString(),
+                    grant_type:'authorization_code',
                     client_id:this.client_id,
                     client_secret:this.client_secret,
                     code_verifier: await createCodeVerifier()
