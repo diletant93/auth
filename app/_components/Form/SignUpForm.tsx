@@ -8,11 +8,13 @@ import { toast } from 'sonner';
 import { useActionToast } from '@/app/_hooks/useActionToast';
 import { useRouter } from 'next/navigation';
 import { useAuthActionHandler } from '@/app/_hooks/useAuthActionHandler';
+import OAuthButtons from '../OAuthButtons/OAuthButtons';
 export default function SignUpForm() {
     const handleSubmit = useAuthActionHandler(signUp)
     return (
         <form className={styles.signInForm} action={handleSubmit}>
             <p className='cta'>Sign Up</p>
+            <OAuthButtons className='flex gap-2'/>
             <InputRow name='name' label='Name' placeHolder='Enter your name' />
             <InputRow name='email' label='Email' type='email' placeHolder='Enter your email' />
             <InputRow name='password' label='Password' type='password' placeHolder='Enter your password' />

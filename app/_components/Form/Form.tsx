@@ -7,11 +7,13 @@ import { signIn } from '@/app/_actions/authActions';
 import { useActionToast } from '@/app/_hooks/useActionToast';
 import { useRouter } from 'next/navigation';
 import { useAuthActionHandler } from '@/app/_hooks/useAuthActionHandler';
+import OAuthButtons from '../OAuthButtons/OAuthButtons';
 export default function Form() {
   const handleSubmit = useAuthActionHandler(signIn)
   return (
     <form className={styles.signInForm} action={handleSubmit}>
       <p className='cta'>Sign in</p>
+      <OAuthButtons  className='flex gap-2'/>
       <InputRow name='email' label='Email' type='email' placeHolder='Enter your email' />
       <InputRow name='password' label='Password' type='password' placeHolder='Enter your password' />
       <div className={styles.authorize}>

@@ -9,7 +9,7 @@ export default function InputRow({label,name,type, placeHolder}:InputRowProps) {
   return (
     <div className={styles.row}>
         <label htmlFor={label}>{label}</label>
-        <input type={type || 'text'} placeholder={placeHolder || ''} name={name}/>
+        <input type={type || 'text'} placeholder={placeHolder || ''} name={name} required/>
     </div>
   );
 }
