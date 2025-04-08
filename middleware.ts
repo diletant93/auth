@@ -27,18 +27,20 @@ async function middlewareSession(request:NextRequest){
     const cookies = request.cookies
     const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value
     const sessionExpire = cookies.get(COOKIE_SESSION_EXPIRE_KEY)?.value
-
+    console.log('inside the sesisonMiddleware')
     if(!sessionId || !sessionExpire) return NextResponse.redirect(new URL('/sign-in',request.url))
-
+    console.log('after being cheked if are not nulls')
     const expiryTime = Number(sessionExpire)
 
     if(Date.now() > expiryTime){
+        console.log('inside the expired session')
         const res = NextResponse.redirect(new URL('/sign-in',request.url))
         res.cookies.delete(COOKIE_SESSION_KEY)
         res.cookies.delete(COOKIE_SESSION_EXPIRE_KEY)
         await deleteSessionById(sessionId)
         return res;
     }
+    console.log('after being checked if not expired')
     return null
 }
 

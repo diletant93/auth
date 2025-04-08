@@ -24,12 +24,13 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
         const oAuthClient = createOAuthClient(provider)
         const authAccount =  await oAuthClient.fetchUser(code)
         const user = await connectAuthAccountToUser(provider, authAccount)
-        createUserSession(user)
+        const isCreatedUserSession = await createUserSession(user)
+        if(!isCreatedUserSession) redirect(`/sign-in?oautherror=${encodeURIComponent('could not create session')}`)
+        redirect('/')
     } catch (error) {   
         console.error(error)
+        redirect(`/sign-in?oautherror=${encodeURIComponent('could not authorize')}`)
     }
-
-    redirect('/')
 }
 
 async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:string; email:string; name:string;}){
@@ -45,6 +46,8 @@ async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:st
     .select('*')
     .eq('email',email)
     .single()
+
+    user = existingUser
     if(!existingUser){
         const {data:createdUser} = await supabase
         .from('users')
@@ -57,7 +60,7 @@ async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:st
         if(!createdUser) throw new Error('Could not create user in connect auth')
         user = createdUser
     }
-    user = existingUser
+    
 
     const {data:existingAuthAccount} =
     await supabase
@@ -66,19 +69,15 @@ async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:st
     .eq('userId',user.id)
     .eq('provider',provider)
     .single()
-    console.log('EXISTING AUTH ACCOUNT:',existingAuthAccount)
+
     if(!existingAuthAccount){
-        console.log({
-            userId:user.id,
-            provider,
-            providerAccountId:id
-        })
-        const {data:createdAuthAccount} = await supabase
+        const {data:createdAuthAccount} = await 
+        supabase
         .from('o_auth_accounts')
         .insert([{
             userId:user.id,
             provider,
-            providerAccountId:id
+            providerAccountId: id,
         }])
         .select('*')
         .single()
