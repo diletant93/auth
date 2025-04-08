@@ -88,7 +88,7 @@ export class oAuthClient<T>{
         })
         const rawUser = await response.json()
         const {data, success} = this.user.schema.safeParse(rawUser)
-        if(!success) return new InvalidUser()
+        if(!success) throw new InvalidUser()
         return this.user.parser(data)
     }
     private async fetchToken(code:string, codeVerifier:string){

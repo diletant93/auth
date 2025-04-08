@@ -1,5 +1,8 @@
 import { createOAuthClient, getAuthState } from "@/app/_auth/oAuthClient";
+import { createUserSession } from "@/app/_auth/session";
+import { supabase } from "@/app/_lib/supabase";
 import { AuthProvider } from "@/app/types/oAuthProvider";
+import { UserRecord } from "@/app/types/UserRecord";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -19,8 +22,9 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
 
     try {
         const oAuthClient = createOAuthClient(provider)
-        const authUser =  await oAuthClient.fetchUser(code)
-        
+        const authAccount =  await oAuthClient.fetchUser(code)
+        const user = await connectAuthAccountToUser(provider, authAccount)
+        createUserSession(user)
     } catch (error) {   
         console.error(error)
     }
@@ -28,12 +32,58 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
     redirect('/')
 }
 
-async function connectAuthAccountToUser(authAccount: {id:string; email:string; name:string;}){
+async function connectAuthAccountToUser(provider:string, {id,email,name}: {id:string; email:string; name:string;}){
     //check if exists
     //if it does not create the user 
     //if such a authAccount exists (check by the id related to the user) 
     //if not create the auth Account
     //return the user
-    
-    
+    let user: UserRecord;
+    const {data:existingUser} = 
+    await supabase
+    .from('users')
+    .select('*')
+    .eq('email',email)
+    .single()
+    if(!existingUser){
+        const {data:createdUser} = await supabase
+        .from('users')
+        .insert([{
+            email,
+            name
+        }])
+        .select('*')
+        .single()
+        if(!createdUser) throw new Error('Could not create user in connect auth')
+        user = createdUser
+    }
+    user = existingUser
+
+    const {data:existingAuthAccount} =
+    await supabase
+    .from('o_auth_accounts')
+    .select('*')
+    .eq('userId',user.id)
+    .eq('provider',provider)
+    .single()
+    console.log('EXISTING AUTH ACCOUNT:',existingAuthAccount)
+    if(!existingAuthAccount){
+        console.log({
+            userId:user.id,
+            provider,
+            providerAccountId:id
+        })
+        const {data:createdAuthAccount} = await supabase
+        .from('o_auth_accounts')
+        .insert([{
+            userId:user.id,
+            provider,
+            providerAccountId:id
+        }])
+        .select('*')
+        .single()
+        console.log(createdAuthAccount)
+        if(!createdAuthAccount) throw new Error('Could not create auth account in connect auth')
+    }
+    return user
 }
