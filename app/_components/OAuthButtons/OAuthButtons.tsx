@@ -10,10 +10,10 @@ export default function OAuthButtons({ className }: Readonly<{ className?: strin
     }
     return (
         <div className={className}>
-            <Button onClick={handleGithub}>
+            <Button onClick={handleGithub} type="button">
                 <Github />
             </Button>
-            <Button onClick={handleDiscord}>
+            <Button onClick={handleDiscord} type="button">
                 <Headset />
             </Button>
         </div>

@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { cookies } from "next/headers";
 import { COOKIE_CODE_VERIFIER_KEY, COOKIE_STATE_EXPIRATION_SECCONDS, COOKIE_STATE_KEY } from "../constants/authenticationRelated";
 import { createDiscordOAuthClient } from "./oAuthClients/discord";
+import {z} from 'zod'
 type oAuthClientConstructorProps = {
     provider:AuthProvider;
     urls:{
@@ -22,6 +23,11 @@ export class oAuthClient<T>{
     private readonly scopes:string[];
     private readonly client_id:string;
     private readonly client_secret:string;
+
+    private readonly tokenSchema = z.object({
+        access_token:z.string(),
+        token_type:z.string(),
+    })
 
     constructor({
         provider,
@@ -70,14 +76,23 @@ export class oAuthClient<T>{
                     grant_type:'authorization_code',
                     client_id:this.client_id,
                     client_secret:this.client_secret,
-                    code_verifier: await createCodeVerifier()
                 })
             })
-            const data = await response.json()
-            console.log('RAW DATA=>>>',data)
+            const rawData = await response.json()
+            const {data, success} = this.tokenSchema.safeParse(rawData)
+            if(!success) throw new InvalidToken()
+            return {
+                accessToken:data.access_token,
+                tokenType:data.token_type
+            }
         } catch (error) {
             throw error
         }
+    }
+}
+class InvalidToken extends Error{
+    constructor(){
+        super('Invalid token')
     }
 }
 

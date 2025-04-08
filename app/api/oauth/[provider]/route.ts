@@ -19,7 +19,8 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{provider
 
     try {
         const oAuthClient = createOAuthClient(provider)
-        await oAuthClient.fetchToken(code)
+       const tokenObj = await oAuthClient.fetchToken(code)
+       console.log('HERE IS THE TOKEN OBJ:',tokenObj)
     } catch (error) {   
         console.error(error)
     }
