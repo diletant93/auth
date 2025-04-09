@@ -17,7 +17,7 @@ export default function User({ user }: UserProps) {
       <div className={style.userCard}>
         <p className={style.userRole}>Role:{user.role}</p>
         <div className={style.controls}>
-          <Link href='/'>
+          <Link href='/' className='flex-1'>
             <Button>
               Home
             </Button>
@@ -32,7 +32,7 @@ export default function User({ user }: UserProps) {
       <div className={style.userCard}>
         <p className={style.userName}>User:{user.name || 'No name yet'}</p>
         <div className={style.controls}>
-          <Link href='/private'>
+          <Link href='/private' className='flex-1'>
             <Button>
               Private page
             </Button>
