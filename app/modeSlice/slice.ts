@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store/store";
 type InitialStateType = {
     mode:'dark'|'light';
     isLoading:boolean;

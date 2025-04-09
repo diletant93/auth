@@ -4,7 +4,6 @@ import InputRow from '../InputRow/InputRow';
 import Button from '../Button/Button';
 import Link from 'next/link';
 import { signIn } from '@/app/_actions/authActions';
-import { useRouter } from 'next/navigation';
 import { useAuthActionHandler } from '@/app/_hooks/useAuthActionHandler';
 import OAuthButtons from '../OAuthButtons/OAuthButtons';
 export default function Form() {
