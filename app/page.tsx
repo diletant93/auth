@@ -7,17 +7,17 @@ export default async function Home() {
   const fullUser = await getCurrentUser({ withFullUser: true, redirectIfNotFound: true })
   if (fullUser) return <User user={fullUser} />
   return (
-    <div className={styles.authorize}> 
-      <Button>
-        <Link href='/sign-in'>
+    <div className={styles.authorize}>
+      <Link href='/sign-in'>
+        <Button>
           Sign in
-        </Link>
-      </Button>
-      <Button>
-        <Link href='/sign-up'>
+        </Button>
+      </Link>
+      <Link href='/sign-up'>
+        <Button>
           Sign up
-        </Link>
-      </Button>
+        </Button>
+      </Link>
     </div>
   );
 }

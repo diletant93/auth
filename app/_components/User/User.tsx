@@ -6,31 +6,39 @@ import { SessionUser, UserRecord } from '@/app/types/UserRecord';
 import Link from 'next/link';
 import ToggleRole from '../ToggleRole/ToggleRole';
 type UserProps = {
-    user:UserRecord | SessionUser
+  user: UserRecord | SessionUser
 }
-function isUserRecord(user:UserRecord | SessionUser): user is UserRecord{
+function isUserRecord(user: UserRecord | SessionUser): user is UserRecord {
   return (user as UserRecord).name !== undefined;
 }
-export default function User({user}:UserProps) {
-  if(!isUserRecord(user)){
+export default function User({ user }: UserProps) {
+  if (!isUserRecord(user)) {
     return (
       <div className={style.userCard}>
-         <p className={style.userRole}>Role:{user.role}</p>
-         <div className={style.controls}>
-          <Button><Link href='/'>Home</Link></Button>
-          <ToggleRole/>
-         </div>
+        <p className={style.userRole}>Role:{user.role}</p>
+        <div className={style.controls}>
+          <Link href='/'>
+            <Button>
+              Home
+            </Button>
+          </Link>
+          <ToggleRole />
+        </div>
       </div>
     );
   }
-  if(isUserRecord(user)){
+  if (isUserRecord(user)) {
     return (
       <div className={style.userCard}>
-         <p className={style.userName}>User:{user.name || 'No name yet'}</p>
-         <div className={style.controls}>
-          <Button><Link href='/private'>Private page</Link></Button>
-          <LogOutButton/>
-         </div>
+        <p className={style.userName}>User:{user.name || 'No name yet'}</p>
+        <div className={style.controls}>
+          <Link href='/private'>
+            <Button>
+              Private page
+            </Button>
+          </Link>
+          <LogOutButton />
+        </div>
       </div>
     );
   }
