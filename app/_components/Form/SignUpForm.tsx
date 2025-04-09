@@ -4,9 +4,6 @@ import InputRow from '../InputRow/InputRow';
 import Button from '../Button/Button';
 import Link from 'next/link';
 import { signUp } from '@/app/_actions/authActions';
-import { toast } from 'sonner';
-import { useActionToast } from '@/app/_hooks/useActionToast';
-import { useRouter } from 'next/navigation';
 import { useAuthActionHandler } from '@/app/_hooks/useAuthActionHandler';
 import OAuthButtons from '../OAuthButtons/OAuthButtons';
 export default function SignUpForm() {
@@ -19,7 +16,7 @@ export default function SignUpForm() {
             <InputRow name='email' label='Email' type='email' placeHolder='Enter your email' />
             <InputRow name='password' label='Password' type='password' placeHolder='Enter your password' />
             <div className={styles.authorize}>
-                <Button >
+                <Button type='button'>
                     <Link href='/sign-in'>
                         Sign in
                     </Link>

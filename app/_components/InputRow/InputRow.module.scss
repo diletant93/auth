@@ -19,7 +19,19 @@
         &::placeholder{
             color: #4f4d4d;
         }
-        outline-offset: .7rem;
+        outline-offset: .2rem;
         outline-color: white;
+    }
+    @media (max-width:640px){
+        & input{
+            padding:1rem .8rem;
+            &::placeholder{
+                font-size:.9rem;
+            }
+        }
+        & label{
+            font-size:1.2rem
+        }
+        margin-top: 1rem;
     }
 }

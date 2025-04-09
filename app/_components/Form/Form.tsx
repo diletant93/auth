@@ -4,7 +4,6 @@ import InputRow from '../InputRow/InputRow';
 import Button from '../Button/Button';
 import Link from 'next/link';
 import { signIn } from '@/app/_actions/authActions';
-import { useActionToast } from '@/app/_hooks/useActionToast';
 import { useRouter } from 'next/navigation';
 import { useAuthActionHandler } from '@/app/_hooks/useAuthActionHandler';
 import OAuthButtons from '../OAuthButtons/OAuthButtons';
@@ -13,17 +12,17 @@ export default function Form() {
   return (
     <form className={styles.signInForm} action={handleSubmit}>
       <p className='cta'>Sign in</p>
-      <OAuthButtons  className='flex gap-2'/>
+      <OAuthButtons  className='flex gap-2 mt-2'/>
       <InputRow name='email' label='Email' type='email' placeHolder='Enter your email' />
       <InputRow name='password' label='Password' type='password' placeHolder='Enter your password' />
       <div className={styles.authorize}>
-        <Button>
-          Sign in
-        </Button>
         <Button type='submit'>
           <Link href='/sign-up'>
             Sign up
           </Link>
+        </Button>
+        <Button type='button'>
+          Sign in
         </Button>
       </div>
     </form>
